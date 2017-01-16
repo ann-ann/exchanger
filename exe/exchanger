@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "exchanger"
+
+Exchanger.exchange(ARGV[0], ARGV[1])
