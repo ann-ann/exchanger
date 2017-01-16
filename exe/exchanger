@@ -3,4 +3,5 @@
 require "bundler/setup"
 require "exchanger"
 
-Exchanger.exchange(ARGV[0], ARGV[1])
+Exchanger::ExchangeRate.seed
+puts Exchanger::ExchangeRate.exchange(amount: ARGV[0], dates: ARGV[1].split(','))

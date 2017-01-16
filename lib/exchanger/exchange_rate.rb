@@ -24,7 +24,7 @@ module Exchanger
     DATE_NORMALIZER = lambda { |date| Date.parse(date) rescue nil }
 
     validates :date, uniqueness: true, presence: true
-    validates :rate, numericality: { greater_than: 0 }
+    validates :rate, numericality: { greater_than: 0 }, presence: true
 
     class << self
       private
