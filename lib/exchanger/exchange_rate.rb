@@ -21,9 +21,10 @@ end
 module Exchanger
   class ExchangeRate < ActiveRecord::Base
     DATA_SOURCE = "https://sdw.ecb.europa.eu/quickviewexport.do?SERIES_KEY=120.EXR.D.USD.EUR.SP00.A&type=csv".freeze
-    DATE_NORMALIZER = lambda { |date| Date.parse(date) }
+    DATE_NORMALIZER = lambda { |date| Date.parse(date) rescue nil }
 
     validates :date, uniqueness: true, presence: true
+    validates :rate, numericality: { greater_than: 0 }
 
     class << self
       private
@@ -63,22 +64,26 @@ module Exchanger
       dates = [*dates].map(&DATE_NORMALIZER)
 
       dates.map do |date|
-        if rate_record = ExchangeRate.where(date: date).first
-          # Regular business day, we have all the data.
-          (rate_record.rate * amount).to_f
-        elsif date.on_weekend? && next_business_day = skip_weekends(date.in_time_zone('Berlin').to_date, 1)
-          # Weekends. When you send exchange request on a weekend, it will be exchanges on the next business day.
-          # Note that this is in CET timezone as per ECB rules. Sorry, no luck exchanging on Moday from Sydney.
-
-          # I wish I knew but I really don't
-          return nil if next_business_day.future?
-
-            rate_record = ExchangeRate.where(date: next_business_day).first
+        if date
+          if rate_record = ExchangeRate.where(date: date).first
+            # Regular business day, we have all the data.
             (rate_record.rate * amount).to_f
+          elsif date.on_weekend? && next_business_day = skip_weekends(date.in_time_zone('Berlin').to_date, 1)
+            # Weekends. When you send exchange request on a weekend, it will be exchanges on the next business day.
+            # Note that this is in CET timezone as per ECB rules. Sorry, no luck exchanging on Moday from Sydney.
+
+            # I wish I knew but I really don't
+            return nil if next_business_day.future?
+
+              rate_record = ExchangeRate.where(date: next_business_day).first
+              (rate_record.rate * amount).to_f
+          else
+            # Sorry, don't know why you couldn't exchange euros on 2012-05-01. Sometimes ECB doesn't have data.
+            # Also handles dates that are in future.
+            "No rate for this date"
+          end
         else
-          # Sorry, don't know why you couldn't exchange euros on 2012-05-01. Sometimes ECB doesn't have data.
-          # Also handles dates that are in future.
-          nil
+          "Invalid date passed"
         end
       end
     end
