@@ -22,7 +22,8 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+  You can test it just from terminal after gem installed. Example:
+    ./exe/exchanger 100 2017-01-16
 
 ## Development
 

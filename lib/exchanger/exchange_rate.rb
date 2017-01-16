@@ -43,14 +43,15 @@ module Exchanger
     # As per https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html, the reference rates are usually
     # updated around 16:00 CET on every working day, except on TARGET closing days (holidays like Christmas).
     # They are based on a regular daily concertation procedure between central banks across Europe, which normally
-    # takes place at 14:15 CET.
+    # takes place at 14:15 CET(but updates arounf 16pm)
     #
     # We implement simplest possible caching based on ECD data update rules mentioned above.
     def self.seed
       last_available_record = ExchangeRate.order(:date).last
 
-      return if last_available_record&.date == skip_weekends(Date.today.in_time_zone('Berlin').to_date, -1)
-
+      if (last_available_record&.date == skip_weekends(Date.today.in_time_zone('Berlin').to_date, -1)) && Time.now.in_time_zone('Berlin').hour >= 16
+        return
+      end
       data = open(DATA_SOURCE).read
 
       CSV.parse(data)[5..-1].each do |date, rate|
