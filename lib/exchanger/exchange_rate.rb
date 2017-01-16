@@ -52,7 +52,8 @@ module Exchanger
       if (last_available_record&.date == skip_weekends(Date.today.in_time_zone('Berlin').to_date, -1)) && Time.now.in_time_zone('Berlin').hour >= 16
         return
       end
-      data = open(DATA_SOURCE).read
+      encoded_url = URI.encode(DATA_SOURCE)
+      data = open(URI.parse(encoded_url)).read
 
       CSV.parse(data)[5..-1].each do |date, rate|
         next if rate == '-'
