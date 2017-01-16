@@ -1,16 +1,19 @@
 # Exchanger
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/exchanger`. To experiment with that code, run `bin/console` for an interactive prompt.
+Gem for exchanging USD to EUROs using ECB rates:
 
-TODO: Delete this and the text above, and describe your gem
+
+
+  https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=120.EXR.D.USD.EUR.SP00.A
+
+
+  It fetches csv data and stores to local sqllite db
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-```ruby
-gem 'exchanger'
-```
+  gem 'currency_exchanger'
 
 And then execute:
 
@@ -18,22 +21,36 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install exchanger
+    $ gem install currency_exchanger
 
 ## Usage
 
   You can test it just from terminal after gem installed. Example:
-    ./exe/exchanger 100 2017-01-16
 
-## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+    $ ./exe/exchanger AMOUNT DATES_SEPARATED_BY_COMMA
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+    $ ./exe/exchanger 100 2017-01-16
+
+
+  Example of gem using:
+
+  Exchanger.exchange(100, Date.today)
+
+
+    => 109.94
+
+
+  Exchanger.exchange(100, [Date.yesterday, Date.today])
+
+
+    => [109.94, 110.02]
+
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/exchanger.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ann-ann/exchanger.
 
 
 ## License
